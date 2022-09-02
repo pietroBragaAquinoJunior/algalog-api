@@ -19,6 +19,8 @@ public class Cliente {
 
     private String nome;
 
+    private String email;
+
     @Column(name = "fone")
     private String telefone;
 
