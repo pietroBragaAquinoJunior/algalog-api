@@ -2,6 +2,7 @@ package com.algaworks.algalog.api.controller;
 
 import com.algaworks.algalog.domain.model.Cliente;
 import com.algaworks.algalog.domain.repository.ClienteRepository;
+import com.algaworks.algalog.domain.service.CatalogoClienteService;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,7 @@ import java.util.Optional;
 public class ClienteController {
 
     private ClienteRepository clienteRepository;
+    private CatalogoClienteService catalogoClienteService;
 
     @GetMapping
     public List<Cliente> listar(){
@@ -40,17 +43,17 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Cliente adicionar(@RequestBody Cliente cliente){
-        return clienteRepository.save(cliente);
+    public Cliente adicionar(@Valid @RequestBody Cliente cliente){
+        return catalogoClienteService.salvar(cliente);
     }
 
     @PutMapping("/{clientId}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable Long clientId, @RequestBody Cliente cliente){
+    public ResponseEntity<Cliente> atualizar(@PathVariable Long clientId, @Valid @RequestBody Cliente cliente){
         if(!clienteRepository.existsById(clientId)){
             return ResponseEntity.notFound().build();
         }
         cliente.setId(clientId);
-        cliente = clienteRepository.save(cliente);
+        cliente = catalogoClienteService.salvar(cliente);
         return ResponseEntity.ok(cliente);
     }
 
@@ -59,7 +62,7 @@ public class ClienteController {
         if(!clienteRepository.existsById(clientId)){
             return ResponseEntity.notFound().build();
         }else{
-            clienteRepository.deleteById(clientId);
+            catalogoClienteService.excluir(clientId);
             return ResponseEntity.noContent().build();
         }
     }
